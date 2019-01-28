@@ -1,6 +1,6 @@
-
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
+#include "SDL2/SDL_mixer.h"
 #include "SDL2/SDL_ttf.h"
 #include <iostream>
 #include <string>
@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <time.h>
 #include <sstream>
+#include <fstream>
 using namespace std;
 ///////////////////////////////
 const int SCREEN_WIDTH = 800;
@@ -28,6 +29,25 @@ SDL_FreeSurface(tempSurface);
 return texure;
 
 }
+long long int file ( int point )
+{
+        long long int BestPoint;
+        fstream PointFile;
+
+        PointFile.open ( "Data.txt" );
+        PointFile >> BestPoint;
+        PointFile.close();
+
+        FILE *fp = fopen("Data.txt", "w");
+        fclose(fp);
+
+        PointFile.open ( "Data.txt" );
+        if (BestPoint < point )
+                BestPoint = point ;
+        PointFile << BestPoint ;
+
+        return BestPoint;
+}
 int main(int argc, char const *argv[]) {
 gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 gRenderer = SDL_CreateRenderer(gWindow , -1 , 0);
@@ -41,6 +61,9 @@ SDL_Texture* normwood=LoadTexture("normwood.png",gRenderer);
 SDL_Texture* doublewood=LoadTexture("doublewoods.png",gRenderer);
 SDL_Texture* invwood=LoadTexture("invwood.png",gRenderer);
 SDL_Texture* doodle=LoadTexture("doodle2.png",gRenderer);
+Mix_Music* gMusic=NULL;
+Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
+gMusic = Mix_LoadMUS("38. Smoke Gets In Your Eyes - Lawrence Welk.mp3");
 ///////////////////////////////////////
 int starter=0;
 int wood[10][5];
@@ -141,6 +164,12 @@ if(event1.type == SDL_QUIT)
 /////////////////////
 while(starter==0)
 {
+  if(Mix_PlayingMusic()==0){
+    Mix_PlayMusic(gMusic,-1);
+  }
+  else{
+    Mix_ResumeMusic();
+  }
   SDL_RenderClear(gRenderer);
   SDL_Rect t;
 t.x=0;
@@ -174,6 +203,8 @@ if(circlex < 5)
 if(circley < 200){
 circley=200;
 score +=vy;
+system("clear");
+cout<<score<<" "<<file(score)<<endl;
 for(int i=0;i<10;i++)
 wood[i][1]+=vy;}
 //////////////////////////////////////
@@ -310,6 +341,6 @@ if(circley>1000)
           SDL_RenderPresent(gRenderer);
           SDL_Delay(50);
 }
-
+cout<<score;
     return 0;
 }
